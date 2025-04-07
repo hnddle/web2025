@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>환영 페이지</title>
+
+  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <style>
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('bg.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Roboto', sans-serif;
+      color: white;
+      text-align: center;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .search-container {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+    }
+
+    .welcome-message {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    .date-temp {
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="search-container">
+    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+      <input class="mdl-textfield__input" type="text" id="search" placeholder="Search">
+      <label class="mdl-textfield__label" for="search">Search</label>
+    </div>
+  </div>
+  
+
+  <div class="container">
+    <div class="welcome-message">Hello My name is jmlee</div>
+    <div class="date-temp" id="date-temp"></div>
+  </div>
+  
+  <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+  <script>
+
+    let temperature = 22; // 임시 온도 값 (°C)
+    let today = new Date();
+    
+    function formatDate(date) {
+      let options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return date.toLocaleDateString('ko-KR', options);
+    }
+    
+    function displayInfo() {
+      let formattedDate = formatDate(today);
+      let infoElement = document.getElementById('date-temp');
+      infoElement.innerHTML = formattedDate + " | 온도: " + temperature + "°C";
+    }
+    
+    displayInfo();
+  </script>
+</body>
+</html>
