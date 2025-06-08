@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Map - 나만의 맛집 지도</title>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=66c3518cc69e4a01ae7b8184d547e54b&libraries=services,clusterer"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #fafafa;
+            color: #333;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        header {
+            background: #ff6b35;
+            color: white;
+            padding: 0.875rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-info {
+            background: rgba(255,255,255,0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+        }
+
+        .main-content {
+            margin-top: 56px;
+            flex: 1;
+            position: relative;
+        }
+
+        .floating-search {
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .search-wrapper {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+        }
+
+        #searchInput {
+            flex: 1;
+            border: none;
+            padding: 0.5rem;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-icon {
+            color: #ff6b35;
+            font-size: 1.2rem;
+        }
+
+        .filter-pills {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .filter-pill {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-pill:hover {
+            border-color: #ff6b35;
+            color: #ff6b35;
+        }
+
+        .filter-pill.active {
+            background: #ff6b35;
+            color: white;
+            border-color: #ff6b35;
+        }
+
+        .nav-tabs {
+            background: white;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-around;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #999;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .tab-btn:hover {
+            color: #ff6b35;
+        }
+
+        .tab-btn.active {
+            color: #ff6b35;
+        }
+
+        .tab-icon {
+            font-size: 1.25rem;
+        }
+
+        #searchBtn {
+            display: none;
+        }
+
+        .tab-content {
+            display: none;
+            height: calc(100vh - 112px);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .list-container {
+            height: 100%;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+
+        .restaurant-grid {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .restaurant-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            display: flex;
+            height: 120px;
+        }
+
+        .restaurant-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .restaurant-image {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .restaurant-info {
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .restaurant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        .restaurant-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .restaurant-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: #ff6b35;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .restaurant-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        .restaurant-category {
+            color: #ff6b35;
+            font-weight: 500;
+        }
+
+        .restaurant-address {
+            color: #999;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .restaurant-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #e55a2b;
+        }
+
+        .btn-scrap {
+            background: white;
+            border: 1px solid #e0e0e0;
+            color: #666;
+            padding: 0.3rem 0.6rem;
+        }
+
+        .btn-scrap:hover {
+            border-color: #ff6b35;
+            color: #ff6b35;
+        }
+
+        .btn-scrap.active {
+            background: #fff5f0;
+            border-color: #ff6b35;
+            color: #ff6b35;
+        }
+
+        .collection-header {
+            padding: 1rem;
+            background: white;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .collection-header h2 {
+            font-size: 1.25rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        #collectionCount {
+            background: #ff6b35;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: white;
+            cursor: pointer;
+            z-index: 10;
+            background: rgba(0,0,0,0.5);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close:hover {
+            background: rgba(0,0,0,0.7);
+        }
+
+        .modal-header {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .modal-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .modal-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #333;
+            min-width: 80px;
+        }
+
+        .map-popup {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            min-width: 200px;
+        }
+
+        .map-popup h3 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: #333;
+        }
+
+        .map-popup p {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .map-popup button {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .kakao-map-popup {
+            z-index: 50 !important;
+        }
+            .filter-pills {
+                padding: 0.5rem;
+            }
+            
+            .restaurant-card {
+                height: 100px;
+            }
+            
+            .restaurant-image {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .restaurant-info {
+                padding: 0.75rem;
+            }
+            
+            .restaurant-name {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>Tasty Map</h1>
+                <div class="user-info">
+                    <span>이정민 (20102246)</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div id="mapTab" class="tab-content active">
+                <div class="floating-search">
+                    <div class="search-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="searchInput" placeholder="맛집, 지역, 카테고리 검색">
+                        <button id="searchBtn">검색</button>
+                    </div>
+                    <div class="filter-pills">
+                        <div class="filter-pill active" data-category="">전체</div>
+                        <div class="filter-pill" data-category="korean">한식</div>
+                        <div class="filter-pill" data-category="chinese">중식</div>
+                        <div class="filter-pill" data-category="japanese">일식</div>
+                        <div class="filter-pill" data-category="western">양식</div>
+                        <div class="filter-pill" data-category="cafe">카페</div>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+
+            <div id="listTab" class="tab-content">
+                <div class="list-container">
+                    <div class="restaurant-grid" id="restaurantGrid"></div>
+                </div>
+            </div>
+
+            <div id="collectionTab" class="tab-content">
+                <div class="list-container">
+                    <div class="collection-header">
+                        <h2>내가 스크랩한 맛집</h2>
+                        <span id="collectionCount">0개</span>
+                    </div>
+                    <div class="restaurant-grid" id="collectionGrid"></div>
+                </div>
+            </div>
+        </main>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="map">
+                <span class="tab-icon">🗺️</span>
+                <span>지도</span>
+            </button>
+            <button class="tab-btn" data-tab="list">
+                <span class="tab-icon">📋</span>
+                <span>목록</span>
+            </button>
+            <button class="tab-btn" data-tab="collection">
+                <span class="tab-icon">❤️</span>
+                <span>스크랩</span>
+            </button>
+        </nav>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const restaurants = [
+            {
+                id: 1,
+                name: "강남 곱창",
+                category: "korean",
+                categoryName: "한식",
+                region: "gangnam",
+                address: "서울 강남구 테헤란로 123",
+                lat: 37.5012,
+                lng: 127.0396,
+                rating: 4.5,
+                image: "https://picsum.photos/400/300?random=1",
+                description: "신선한 곱창과 대창을 즐길 수 있는 강남의 인기 맛집입니다.",
+                phone: "02-1234-5678",
+                hours: "17:00 - 02:00",
+                menu: ["곱창 구이", "대창 구이", "막창 구이"],
+                price: "15,000원 ~ 25,000원"
+            },
+            {
+                id: 2,
+                name: "홍대 라멘집",
+                category: "japanese",
+                categoryName: "일식",
+                region: "hongdae",
+                address: "서울 마포구 와우산로 456",
+                lat: 37.5563,
+                lng: 126.9235,
+                rating: 4.8,
+                image: "https://picsum.photos/400/300?random=2",
+                description: "진한 돈코츠 라멘으로 유명한 홍대의 라멘 전문점입니다.",
+                phone: "02-2345-6789",
+                hours: "11:30 - 22:00",
+                menu: ["돈코츠 라멘", "미소 라멘", "츠케멘"],
+                price: "10,000원 ~ 15,000원"
+            },
+            {
+                id: 3,
+                name: "명동 파스타",
+                category: "western",
+                categoryName: "양식",
+                region: "myeongdong",
+                address: "서울 중구 명동길 789",
+                lat: 37.5636,
+                lng: 126.9869,
+                rating: 4.3,
+                image: "https://picsum.photos/400/300?random=3",
+                description: "수제 파스타와 피자를 즐길 수 있는 명동의 이탈리안 레스토랑입니다.",
+                phone: "02-3456-7890",
+                hours: "11:00 - 22:00",
+                menu: ["까르보나라", "알리오 올리오", "마르게리타 피자"],
+                price: "15,000원 ~ 30,000원"
+            },
+            {
+                id: 4,
+                name: "이태원 버거",
+                category: "western",
+                categoryName: "양식",
+                region: "itaewon",
+                address: "서울 용산구 이태원로 321",
+                lat: 37.5347,
+                lng: 126.9945,
+                rating: 4.6,
+                image: "https://picsum.photos/400/300?random=4",
+                description: "수제 패티와 신선한 재료로 만든 프리미엄 버거 전문점입니다.",
+                phone: "02-4567-8901",
+                hours: "11:00 - 23:00",
+                menu: ["클래식 버거", "베이컨 치즈버거", "머쉬룸 버거"],
+                price: "12,000원 ~ 18,000원"
+            },
+            {
+                id: 5,
+                name: "잠실 짜장면",
+                category: "chinese",
+                categoryName: "중식",
+                region: "jamsil",
+                address: "서울 송파구 올림픽로 654",
+                lat: 37.5133,
+                lng: 127.1001,
+                rating: 4.2,
+                image: "https://picsum.photos/400/300?random=5",
+                description: "전통 방식으로 만든 수타 짜장면이 일품인 중국 요리 전문점입니다.",
+                phone: "02-5678-9012",
+                hours: "10:30 - 21:30",
+                menu: ["짜장면", "짬뽕", "탕수육"],
+                price: "8,000원 ~ 25,000원"
+            },
+            {
+                id: 6,
+                name: "강남 스시",
+                category: "japanese",
+                categoryName: "일식",
+                region: "gangnam",
+                address: "서울 강남구 봉은사로 987",
+                lat: 37.5172,
+                lng: 127.0473,
+                rating: 4.9,
+                image: "https://picsum.photos/400/300?random=6",
+                description: "신선한 활어와 숙성 참치를 사용하는 오마카세 전문점입니다.",
+                phone: "02-6789-0123",
+                hours: "12:00 - 22:00",
+                menu: ["런치 오마카세", "디너 오마카세", "사시미 정식"],
+                price: "50,000원 ~ 150,000원"
+            },
+            {
+                id: 7,
+                name: "홍대 떡볶이",
+                category: "korean",
+                categoryName: "한식",
+                region: "hongdae",
+                address: "서울 마포구 홍익로 111",
+                lat: 37.5547,
+                lng: 126.9221,
+                rating: 4.4,
+                image: "https://picsum.photos/400/300?random=7",
+                description: "매콤달콤한 떡볶이와 다양한 분식을 즐길 수 있는 홍대 맛집입니다.",
+                phone: "02-7890-1234",
+                hours: "11:00 - 23:00",
+                menu: ["로제 떡볶이", "짜장 떡볶이", "김밥"],
+                price: "5,000원 ~ 15,000원"
+            },
+            {
+                id: 8,
+                name: "명동 카페",
+                category: "cafe",
+                categoryName: "카페",
+                region: "myeongdong",
+                address: "서울 중구 남대문로 222",
+                lat: 37.5607,
+                lng: 126.9858,
+                rating: 4.7,
+                image: "https://picsum.photos/400/300?random=8",
+                description: "수제 디저트와 스페셜티 커피를 즐길 수 있는 명동의 카페입니다.",
+                phone: "02-8901-2345",
+                hours: "08:00 - 22:00",
+                menu: ["아메리카노", "카페라떼", "티라미수"],
+                price: "5,000원 ~ 12,000원"
+            },
+            {
+                id: 9,
+                name: "이태원 태국 요리",
+                category: "western",
+                categoryName: "양식",
+                region: "itaewon",
+                address: "서울 용산구 녹사평대로 333",
+                lat: 37.5341,
+                lng: 126.9900,
+                rating: 4.5,
+                image: "https://picsum.photos/400/300?random=9",
+                description: "정통 태국 요리를 맛볼 수 있는 이태원의 인기 레스토랑입니다.",
+                phone: "02-9012-3456",
+                hours: "11:30 - 22:30",
+                menu: ["팟타이", "똠얌꿍", "그린 커리"],
+                price: "12,000원 ~ 20,000원"
+            },
+            {
+                id: 10,
+                name: "잠실 브런치",
+                category: "cafe",
+                categoryName: "카페",
+                region: "jamsil",
+                address: "서울 송파구 송파대로 444",
+                lat: 37.5145,
+                lng: 127.1050,
+                rating: 4.6,
+                image: "https://picsum.photos/400/300?random=10",
+                description: "건강한 브런치와 신선한 샐러드를 제공하는 잠실의 브런치 카페입니다.",
+                phone: "02-0123-4567",
+                hours: "09:00 - 21:00",
+                menu: ["에그 베네딕트", "아보카도 토스트", "리코타 팬케이크"],
+                price: "15,000원 ~ 25,000원"
+            },
+            {
+                id: 11,
+                name: "강남 삼겹살",
+                category: "korean",
+                categoryName: "한식",
+                region: "gangnam",
+                address: "서울 강남구 강남대로 555",
+                lat: 37.4979,
+                lng: 127.0276,
+                rating: 4.3,
+                image: "https://picsum.photos/400/300?random=11",
+                description: "제주 흑돼지와 한우를 즐길 수 있는 강남의 고기 전문점입니다.",
+                phone: "02-1357-2468",
+                hours: "17:00 - 01:00",
+                menu: ["제주 흑돼지", "한우 등심", "된장찌개"],
+                price: "20,000원 ~ 50,000원"
+            },
+            {
+                id: 12,
+                name: "홍대 피자",
+                category: "western",
+                categoryName: "양식",
+                region: "hongdae",
+                address: "서울 마포구 어울마당로 666",
+                lat: 37.5579,
+                lng: 126.9245,
+                rating: 4.4,
+                image: "https://picsum.photos/400/300?random=12",
+                description: "화덕에서 구운 정통 나폴리 피자를 맛볼 수 있는 홍대 맛집입니다.",
+                phone: "02-2468-1357",
+                hours: "11:30 - 23:00",
+                menu: ["마르게리타", "디아볼라", "콰트로 포르마지"],
+                price: "18,000원 ~ 30,000원"
+            }
+        ];
+
+        let map;
+        let markers = [];
+        let currentRestaurants = [...restaurants];
+        let scrapedRestaurants = JSON.parse(localStorage.getItem('scrapedRestaurants') || '[]');
+
+        function initMap() {
+            const mapContainer = document.getElementById('map');
+            const mapOption = {
+                center: new kakao.maps.LatLng(37.5400, 127.0100),
+                level: 6
+            };
+            
+            map = new kakao.maps.Map(mapContainer, mapOption);
+            
+            displayMarkers(currentRestaurants);
+        }
+
+        function displayMarkers(restaurantList) {
+            clearMarkers();
+            
+            restaurantList.forEach(restaurant => {
+                const markerPosition = new kakao.maps.LatLng(restaurant.lat, restaurant.lng);
+                const marker = new kakao.maps.Marker({
+                    position: markerPosition,
+                    map: map
+                });
+                
+                const content = `
+                    <div class="map-popup">
+                        <h3>${restaurant.name}</h3>
+                        <p>${restaurant.categoryName} • ⭐ ${restaurant.rating}</p>
+                        <button class="btn btn-primary" onclick="showRestaurantDetail(${restaurant.id})">상세보기</button>
+                    </div>
+                `;
+                
+                const overlay = new kakao.maps.CustomOverlay({
+                    content: content,
+                    position: markerPosition,
+                    yAnchor: 1.2
+                });
+                
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    overlay.setMap(map);
+                    setTimeout(() => overlay.setMap(null), 5000);
+                });
+                
+                markers.push(marker);
+            });
+        }
+
+        function clearMarkers() {
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+        }
+
+        function displayRestaurantList(restaurantList) {
+            const grid = document.getElementById('restaurantGrid');
+            grid.innerHTML = '';
+            
+            restaurantList.forEach(restaurant => {
+                const card = createRestaurantCard(restaurant);
+                grid.appendChild(card);
+            });
+        }
+
+        function displayCollection() {
+            const grid = document.getElementById('collectionGrid');
+            const count = document.getElementById('collectionCount');
+            grid.innerHTML = '';
+            
+            const scrappedList = restaurants.filter(r => scrapedRestaurants.includes(r.id));
+            count.textContent = `${scrappedList.length}개`;
+            
+            if (scrappedList.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #999; padding: 3rem 1rem; font-size: 0.9rem;">❤️ 아직 스크랩한 맛집이 없어요<br>마음에 드는 맛집을 스크랩해보세요!</p>';
+                return;
+            }
+            
+            scrappedList.forEach(restaurant => {
+                const card = createRestaurantCard(restaurant);
+                grid.appendChild(card);
+            });
+        }
+
+        function createRestaurantCard(restaurant) {
+            const card = document.createElement('div');
+            card.className = 'restaurant-card';
+            
+            const isScrapped = scrapedRestaurants.includes(restaurant.id);
+            
+            card.innerHTML = `
+                <img src="${restaurant.image}" alt="${restaurant.name}" class="restaurant-image">
+                <div class="restaurant-info">
+                    <div>
+                        <div class="restaurant-header">
+                            <h3 class="restaurant-name">${restaurant.name}</h3>
+                            <div class="restaurant-rating">⭐ ${restaurant.rating}</div>
+                        </div>
+                        <div class="restaurant-meta">
+                            <span class="restaurant-category">${restaurant.categoryName}</span>
+                            <span>•</span>
+                            <span class="restaurant-address">${restaurant.address}</span>
+                        </div>
+                    </div>
+                    <div class="restaurant-actions">
+                        <button class="btn btn-primary" onclick="showRestaurantDetail(${restaurant.id})">상세보기</button>
+                        <button class="btn btn-scrap ${isScrapped ? 'active' : ''}" onclick="toggleScrap(${restaurant.id})">
+                            ${isScrapped ? '❤️' : '🤍'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function showRestaurantDetail(id) {
+            const restaurant = restaurants.find(r => r.id === id);
+            if (!restaurant) return;
+            
+            const modal = document.getElementById('modal');
+            const modalBody = document.getElementById('modalBody');
+            const isScrapped = scrapedRestaurants.includes(restaurant.id);
+            
+            modalBody.innerHTML = `
+                <div class="modal-header">
+                    <img src="${restaurant.image}" alt="${restaurant.name}">
+                </div>
+                <div class="modal-body">
+                    <h2 class="modal-title">${restaurant.name}</h2>
+                    <div class="modal-info">
+                        <div class="info-item">
+                            <span class="info-label">카테고리:</span>
+                            <span>${restaurant.categoryName}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">평점:</span>
+                            <span>⭐ ${restaurant.rating}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">주소:</span>
+                            <span>${restaurant.address}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">전화번호:</span>
+                            <span>${restaurant.phone}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">영업시간:</span>
+                            <span>${restaurant.hours}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">가격대:</span>
+                            <span>${restaurant.price}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">대표메뉴:</span>
+                            <span>${restaurant.menu.join(', ')}</span>
+                        </div>
+                    </div>
+                    <p style="margin-top: 1rem; color: #666; line-height: 1.6;">${restaurant.description}</p>
+                    <div class="restaurant-actions" style="margin-top: 1.5rem;">
+                        <button class="btn btn-scrap ${isScrapped ? 'active' : ''}" onclick="toggleScrap(${restaurant.id})">
+                            ${isScrapped ? '스크랩 취소' : '스크랩하기'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        function toggleScrap(id) {
+            const index = scrapedRestaurants.indexOf(id);
+            if (index > -1) {
+                scrapedRestaurants.splice(index, 1);
+            } else {
+                scrapedRestaurants.push(id);
+            }
+            
+            localStorage.setItem('scrapedRestaurants', JSON.stringify(scrapedRestaurants));
+            
+            if (document.querySelector('.tab-btn.active').dataset.tab === 'list') {
+                displayRestaurantList(currentRestaurants);
+            } else if (document.querySelector('.tab-btn.active').dataset.tab === 'collection') {
+                displayCollection();
+            }
+            
+            const modalScrapBtn = document.querySelector('.modal-body .btn-scrap');
+            if (modalScrapBtn) {
+                const isScrapped = scrapedRestaurants.includes(id);
+                modalScrapBtn.className = `btn btn-scrap ${isScrapped ? 'active' : ''}`;
+                modalScrapBtn.textContent = isScrapped ? '❤️ 스크랩 취소' : '🤍 스크랩하기';
+            }
+        }
+
+        function searchRestaurants() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const activeCategory = document.querySelector('.filter-pill.active').dataset.category;
+            
+            currentRestaurants = restaurants.filter(restaurant => {
+                const matchesSearch = !searchTerm || 
+                    restaurant.name.toLowerCase().includes(searchTerm) ||
+                    restaurant.address.toLowerCase().includes(searchTerm) ||
+                    restaurant.categoryName.toLowerCase().includes(searchTerm);
+                
+                const matchesCategory = !activeCategory || restaurant.category === activeCategory;
+                
+                return matchesSearch && matchesCategory;
+            });
+            
+            const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+            if (activeTab === 'map') {
+                displayMarkers(currentRestaurants);
+            } else if (activeTab === 'list') {
+                displayRestaurantList(currentRestaurants);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            displayRestaurantList(currentRestaurants);
+            displayCollection();
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    const tabId = this.dataset.tab + 'Tab';
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    if (this.dataset.tab === 'collection') {
+                        displayCollection();
+                    }
+                });
+            });
+            
+            document.getElementById('searchInput').addEventListener('input', searchRestaurants);
+            
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                    searchRestaurants();
+                });
+            });
+            
+            const modal = document.getElementById('modal');
+            const closeBtn = document.querySelector('.close');
+            
+            closeBtn.onclick = function() {
+                modal.style.display = 'none';
+            }
+            
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
