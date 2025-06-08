@@ -457,6 +457,8 @@
         .kakao-map-popup {
             z-index: 50 !important;
         }
+
+        @media (max-width: 768px) {
             .filter-pills {
                 padding: 0.5rem;
             }
@@ -767,7 +769,6 @@
         function initMap() {
             const mapContainer = document.getElementById('map');
             
-            // 카카오맵 API가 로드되지 않은 경우
             if (typeof kakao === 'undefined' || !kakao.maps) {
                 mapContainer.innerHTML = `
                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f5f5f5;">
@@ -1006,9 +1007,10 @@
             }
         }
 
-        // 전역 함수로 설정
         window.showRestaurantDetail = showRestaurantDetail;
         window.toggleScrap = toggleScrap;
+
+        document.addEventListener('DOMContentLoaded', function() {
             initMap();
             displayRestaurantList(currentRestaurants);
             displayCollection();
