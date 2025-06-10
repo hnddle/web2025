@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>함수와 스코프</title>
+</head>
+<body>
+    <h1>함수와 스코프</h1>
+    
+    <h2>함수란?</h2>
+    <ul>
+        <li>특정 작업을 수행하는 코드 블록</li>
+        <li>재사용 가능한 코드 단위</li>
+        <li>입력값(매개변수)을 받아 처리 후 결과값(반환값) 출력</li>
+    </ul>
+
+    <h2>함수 선언 방법</h2>
+    
+    <h3>1. 함수 선언문</h3>
+    <pre>
+function add(a, b) {
+    return a + b;
+}
+
+let result = add(3, 5);
+console.log(result);
+    </pre>
+
+    <h3>2. 함수 표현식</h3>
+    <pre>
+let multiply = function(a, b) {
+    return a * b;
+};
+
+let result = multiply(4, 5);
+console.log(result);
+    </pre>
+
+    <h3>3. 화살표 함수</h3>
+    <pre>
+let divide = (a, b) => {
+    return a / b;
+};
+
+let subtract = (a, b) => a - b;
+
+let greet = name => "안녕하세요, " + name + "님!";
+    </pre>
+
+    <h2>매개변수와 인수</h2>
+    <ul>
+        <li>매개변수 : 함수 정의시 사용하는 변수</li>
+        <li>인수 : 함수 호출시 전달하는 실제 값</li>
+    </ul>
+    <pre>
+function introduce(name, age) {
+    console.log("이름: " + name);
+    console.log("나이: " + age);
+}
+
+introduce("홍길동", 25);
+    </pre>
+
+    <h2>기본 매개변수</h2>
+    <pre>
+function greet(name = "손님") {
+    console.log("안녕하세요, " + name + "님!");
+}
+
+greet();
+greet("김철수");
+    </pre>
+
+    <h2>반환값</h2>
+    <pre>
+function square(x) {
+    return x * x;
+}
+
+function noReturn() {
+    console.log("반환값이 없습니다");
+}
+
+let result1 = square(5);
+let result2 = noReturn();
+console.log(result2);
+    </pre>
+
+    <h2>스코프(Scope)</h2>
+    <ul>
+        <li>변수가 접근 가능한 범위</li>
+        <li>전역 스코프 : 어디서든 접근 가능</li>
+        <li>지역 스코프 : 특정 영역에서만 접근 가능</li>
+    </ul>
+
+    <h3>전역 스코프</h3>
+    <pre>
+let globalVar = "전역 변수";
+
+function test() {
+    console.log(globalVar);
+}
+
+test();
+console.log(globalVar);
+    </pre>
+
+    <h3>함수 스코프</h3>
+    <pre>
+function outer() {
+    let outerVar = "외부 변수";
+    
+    function inner() {
+        let innerVar = "내부 변수";
+        console.log(outerVar);
+        console.log(innerVar);
+    }
+    
+    inner();
+}
+
+outer();
+    </pre>
+
+    <h3>블록 스코프</h3>
+    <pre>
+if (true) {
+    let blockVar = "블록 변수";
+    const blockConst = "블록 상수";
+    var functionVar = "함수 스코프 변수";
+}
+
+console.log(functionVar);
+    </pre>
+
+    <h2>호이스팅(Hoisting)</h2>
+    <ul>
+        <li>변수와 함수 선언이 최상단으로 끌어올려지는 현상</li>
+        <li>선언은 호이스팅되지만 초기화는 안됨</li>
+    </ul>
+    <pre>
+console.log(hoistedFunc());
+
+function hoistedFunc() {
+    return "호이스팅된 함수";
+}
+
+console.log(notHoisted);
+var notHoisted = "변수 호이스팅";
+    </pre>
+
+    <h2>클로저(Closure)</h2>
+    <pre>
+function outerFunction(x) {
+    return function(y) {
+        return x + y;
+    };
+}
+
+let add5 = outerFunction(5);
+console.log(add5(3));
+console.log(add5(7));
+    </pre>
+
+    <h2>콜백 함수</h2>
+    <pre>
+function calculate(a, b, callback) {
+    let result = callback(a, b);
+    console.log("결과: " + result);
+}
+
+calculate(10, 5, function(x, y) {
+    return x + y;
+});
+
+calculate(10, 5, (x, y) => x * y);
+    </pre>
+
+    <hr>
+    
+    <h2>실습</h2>
+    <button onclick="testFunction()">함수 테스트</button>
+    <button onclick="testScope()">스코프 테스트</button>
+    <button onclick="testClosure()">클로저 테스트</button>
+    
+    <script>
+        function testFunction() {
+            function getArea(width, height) {
+                return width * height;
+            }
+            
+            let area = getArea(10, 5);
+            alert("사각형 넓이: " + area);
+        }
+        
+        let globalCount = 0;
+        
+        function testScope() {
+            let localCount = 0;
+            globalCount++;
+            localCount++;
+            
+            alert("전역 카운트: " + globalCount + "\n지역 카운트: " + localCount);
+        }
+        
+        function testClosure() {
+            function counter() {
+                let count = 0;
+                return function() {
+                    count++;
+                    return count;
+                };
+            }
+            
+            let myCounter = counter();
+            alert("카운터: " + myCounter() + ", " + myCounter() + ", " + myCounter());
+        }
+    </script>
+</body>
+</html>
