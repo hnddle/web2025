@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>내장 객체</title>
+</head>
+<body>
+    <h1>내장 객체</h1>
+    
+    <h2>String 객체</h2>
+    <ul>
+        <li>문자열을 다루는 객체</li>
+        <li>문자열은 불변(immutable)</li>
+    </ul>
+    
+    <h3>주요 메서드</h3>
+    <pre>
+let str = "Hello World";
+
+str.length;
+str.charAt(0);
+str.indexOf("World");
+str.lastIndexOf("o");
+str.substring(0, 5);
+str.slice(6, 11);
+str.toLowerCase();
+str.toUpperCase();
+str.trim();
+str.replace("World", "JavaScript");
+str.split(" ");
+str.includes("Hello");
+str.startsWith("Hello");
+str.endsWith("World");
+    </pre>
+
+    <h2>Number 객체</h2>
+    <ul>
+        <li>숫자를 다루는 객체</li>
+    </ul>
+    
+    <h3>주요 메서드</h3>
+    <pre>
+let num = 123.456;
+
+num.toFixed(2);
+num.toPrecision(5);
+num.toString();
+
+Number.parseInt("123");
+Number.parseFloat("123.45");
+Number.isNaN(NaN);
+Number.isFinite(123);
+Number.isInteger(123);
+
+Number.MAX_VALUE;
+Number.MIN_VALUE;
+Number.POSITIVE_INFINITY;
+Number.NEGATIVE_INFINITY;
+    </pre>
+
+    <h2>Math 객체</h2>
+    <ul>
+        <li>수학 계산을 위한 객체</li>
+        <li>정적 메서드만 제공</li>
+    </ul>
+    
+    <h3>주요 메서드</h3>
+    <pre>
+Math.PI;
+Math.E;
+
+Math.abs(-5);
+Math.round(4.7);
+Math.ceil(4.1);
+Math.floor(4.9);
+Math.max(1, 2, 3);
+Math.min(1, 2, 3);
+Math.pow(2, 3);
+Math.sqrt(16);
+Math.random();
+
+Math.sin(Math.PI / 2);
+Math.cos(0);
+Math.tan(Math.PI / 4);
+    </pre>
+
+    <h2>Date 객체</h2>
+    <ul>
+        <li>날짜와 시간을 다루는 객체</li>
+    </ul>
+    
+    <h3>생성과 메서드</h3>
+    <pre>
+let now = new Date();
+let date1 = new Date("2024-01-01");
+let date2 = new Date(2024, 0, 1);
+
+now.getFullYear();
+now.getMonth();
+now.getDate();
+now.getDay();
+now.getHours();
+now.getMinutes();
+now.getSeconds();
+now.getMilliseconds();
+
+now.setFullYear(2025);
+now.setMonth(11);
+
+now.toString();
+now.toLocaleDateString();
+now.toLocaleTimeString();
+now.toISOString();
+
+Date.now();
+    </pre>
+
+    <h2>Array 객체</h2>
+    <ul>
+        <li>배열을 다루는 객체</li>
+    </ul>
+    
+    <h3>주요 메서드</h3>
+    <pre>
+let arr = [1, 2, 3, 4, 5];
+
+arr.push(6);
+arr.pop();
+arr.unshift(0);
+arr.shift();
+
+arr.slice(1, 3);
+arr.splice(2, 1, "a", "b");
+
+arr.indexOf(3);
+arr.includes(4);
+
+arr.join("-");
+arr.reverse();
+arr.sort();
+
+arr.forEach(function(item) {
+    console.log(item);
+});
+
+let doubled = arr.map(x => x * 2);
+let filtered = arr.filter(x => x > 2);
+let sum = arr.reduce((acc, cur) => acc + cur, 0);
+
+arr.find(x => x > 3);
+arr.findIndex(x => x > 3);
+arr.every(x => x > 0);
+arr.some(x => x > 4);
+    </pre>
+
+    <h2>Object 객체</h2>
+    <ul>
+        <li>모든 객체의 기본</li>
+    </ul>
+    
+    <h3>주요 메서드</h3>
+    <pre>
+let obj = {name: "홍길동", age: 25};
+
+Object.keys(obj);
+Object.values(obj);
+Object.entries(obj);
+
+Object.assign({}, obj);
+Object.freeze(obj);
+Object.seal(obj);
+
+obj.hasOwnProperty("name");
+"toString" in obj;
+    </pre>
+
+    <h2>RegExp 객체</h2>
+    <ul>
+        <li>정규표현식을 다루는 객체</li>
+    </ul>
+    
+    <h3>기본 사용법</h3>
+    <pre>
+let pattern1 = /hello/i;
+let pattern2 = new RegExp("hello", "i");
+
+let text = "Hello World";
+pattern1.test(text);
+text.match(pattern1);
+text.search(pattern1);
+text.replace(/hello/i, "Hi");
+
+let email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+email.test("test@example.com");
+    </pre>
+
+    <hr>
+    
+    <h2>실습</h2>
+    
+    <div style="margin: 20px 0;">
+        <h3>문자열 처리</h3>
+        <input type="text" id="stringInput" placeholder="문자열 입력">
+        <button onclick="processString()">처리</button>
+        <div id="stringResult" style="margin-top: 10px;"></div>
+    </div>
+    
+    <div style="margin: 20px 0;">
+        <h3>날짜 계산</h3>
+        <button onclick="showDate()">현재 날짜/시간</button>
+        <button onclick="calculateDays()">D-Day 계산</button>
+        <div id="dateResult" style="margin-top: 10px;"></div>
+    </div>
+    
+    <div style="margin: 20px 0;">
+        <h3>배열 처리</h3>
+        <button onclick="arrayDemo()">배열 데모</button>
+        <div id="arrayResult" style="margin-top: 10px;"></div>
+    </div>
+    
+    <script>
+        function processString() {
+            let input = document.getElementById("stringInput").value;
+            let result = document.getElementById("stringResult");
+            
+            result.innerHTML = 
+                "길이: " + input.length + "<br>" +
+                "대문자: " + input.toUpperCase() + "<br>" +
+                "소문자: " + input.toLowerCase() + "<br>" +
+                "첫 글자: " + input.charAt(0) + "<br>" +
+                "마지막 글자: " + input.charAt(input.length - 1);
+        }
+        
+        function showDate() {
+            let now = new Date();
+            let result = document.getElementById("dateResult");
+            
+            result.innerHTML = 
+                "현재 시간: " + now.toString() + "<br>" +
+                "년: " + now.getFullYear() + "<br>" +
+                "월: " + (now.getMonth() + 1) + "<br>" +
+                "일: " + now.getDate() + "<br>" +
+                "시: " + now.getHours() + "<br>" +
+                "분: " + now.getMinutes();
+        }
+        
+        function calculateDays() {
+            let target = new Date("2025-01-01");
+            let now = new Date();
+            let diff = target - now;
+            let days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            
+            document.getElementById("dateResult").innerHTML = 
+                "2025년 1월 1일까지 " + days + "일 남았습니다.";
+        }
+        
+        function arrayDemo() {
+            let numbers = [5, 2, 8, 1, 9, 3];
+            let result = document.getElementById("arrayResult");
+            
+            result.innerHTML = 
+                "원본 배열: " + numbers.join(", ") + "<br>" +
+                "정렬: " + [...numbers].sort((a, b) => a - b).join(", ") + "<br>" +
+                "2배: " + numbers.map(x => x * 2).join(", ") + "<br>" +
+                "5보다 큰 수: " + numbers.filter(x => x > 5).join(", ") + "<br>" +
+                "합계: " + numbers.reduce((acc, cur) => acc + cur, 0);
+        }
+    </script>
+</body>
+</html>
