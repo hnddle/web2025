@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>연산자와 제어문</title>
+</head>
+<body>
+    <h1>연산자와 제어문</h1>
+    
+    <h2>산술 연산자</h2>
+    <ul>
+        <li>+ : 더하기</li>
+        <li>- : 빼기</li>
+        <li>* : 곱하기</li>
+        <li>/ : 나누기</li>
+        <li>% : 나머지</li>
+        <li>** : 거듭제곱</li>
+    </ul>
+    <pre>
+let a = 10;
+let b = 3;
+console.log(a + b);  
+console.log(a - b);  
+console.log(a * b);  
+console.log(a / b);  
+console.log(a % b);  
+console.log(a ** b); 
+    </pre>
+
+    <h2>대입 연산자</h2>
+    <ul>
+        <li>= : 대입</li>
+        <li>+= : 더한 후 대입</li>
+        <li>-= : 뺀 후 대입</li>
+        <li>*= : 곱한 후 대입</li>
+        <li>/= : 나눈 후 대입</li>
+    </ul>
+    <pre>
+let x = 10;
+x += 5;  
+x -= 3;  
+x *= 2;  
+x /= 4;  
+    </pre>
+
+    <h2>비교 연산자</h2>
+    <ul>
+        <li>== : 같다 (타입 변환 후 비교)</li>
+        <li>=== : 같다 (타입까지 비교)</li>
+        <li>!= : 같지 않다</li>
+        <li>!== : 같지 않다 (타입까지 비교)</li>
+        <li>&gt; : 크다</li>
+        <li>&lt; : 작다</li>
+        <li>&gt;= : 크거나 같다</li>
+        <li>&lt;= : 작거나 같다</li>
+    </ul>
+    <pre>
+console.log(5 == "5");   
+console.log(5 === "5");  
+console.log(5 != "5");   
+console.log(5 !== "5");  
+    </pre>
+
+    <h2>논리 연산자</h2>
+    <ul>
+        <li>&& : AND (둘 다 참일 때 참)</li>
+        <li>|| : OR (하나라도 참이면 참)</li>
+        <li>! : NOT (참/거짓 반대)</li>
+    </ul>
+    <pre>
+let age = 25;
+let hasLicense = true;
+
+if (age >= 18 && hasLicense) {
+    console.log("운전 가능");
+}
+
+if (age < 18 || !hasLicense) {
+    console.log("운전 불가");
+}
+    </pre>
+
+    <h2>조건문 - if문</h2>
+    <pre>
+let score = 85;
+
+if (score >= 90) {
+    console.log("A학점");
+} else if (score >= 80) {
+    console.log("B학점");
+} else if (score >= 70) {
+    console.log("C학점");
+} else {
+    console.log("F학점");
+}
+    </pre>
+
+    <h2>조건문 - switch문</h2>
+    <pre>
+let day = 3;
+let dayName;
+
+switch(day) {
+    case 1:
+        dayName = "월요일";
+        break;
+    case 2:
+        dayName = "화요일";
+        break;
+    case 3:
+        dayName = "수요일";
+        break;
+    default:
+        dayName = "기타";
+}
+console.log(dayName);
+    </pre>
+
+    <h2>반복문 - for문</h2>
+    <pre>
+for (let i = 0; i < 5; i++) {
+    console.log(i);
+}
+
+for (let i = 1; i <= 10; i++) {
+    console.log("2 x " + i + " = " + (2 * i));
+}
+    </pre>
+
+    <h2>반복문 - while문</h2>
+    <pre>
+let count = 0;
+while (count < 5) {
+    console.log(count);
+    count++;
+}
+
+let num = 10;
+do {
+    console.log(num);
+    num--;
+} while (num > 0);
+    </pre>
+
+    <h2>break와 continue</h2>
+    <pre>
+for (let i = 0; i < 10; i++) {
+    if (i === 5) {
+        break;
+    }
+    console.log(i);
+}
+
+for (let i = 0; i < 10; i++) {
+    if (i % 2 === 0) {
+        continue;
+    }
+    console.log(i);
+}
+    </pre>
+
+    <h2>삼항 연산자</h2>
+    <pre>
+let age = 20;
+let message = (age >= 18) ? "성인" : "미성년자";
+console.log(message);
+    </pre>
+
+    <hr>
+    
+    <h2>실습 예제</h2>
+    <button onclick="testOperators()">연산자 테스트</button>
+    <button onclick="testCondition()">조건문 테스트</button>
+    <button onclick="testLoop()">반복문 테스트</button>
+    
+    <script>
+        function testOperators() {
+            let a = 10;
+            let b = 5;
+            alert("10 + 5 = " + (a + b) + "\n" +
+                  "10 - 5 = " + (a - b) + "\n" +
+                  "10 * 5 = " + (a * b) + "\n" +
+                  "10 / 5 = " + (a / b));
+        }
+        
+        function testCondition() {
+            let num = prompt("숫자를 입력하세요:");
+            if (num > 0) {
+                alert("양수입니다");
+            } else if (num < 0) {
+                alert("음수입니다");
+            } else {
+                alert("0입니다");
+            }
+        }
+        
+        function testLoop() {
+            let result = "";
+            for (let i = 1; i <= 5; i++) {
+                result += i + " ";
+            }
+            alert("1부터 5까지: " + result);
+        }
+    </script>
+</body>
+</html>
