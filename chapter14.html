@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>오픈 API, JSON API</title>
+</head>
+<body>
+    <h1>오픈 API, JSON API</h1>
+    
+    <h2>오픈 API란?</h2>
+    <ul>
+        <li>공개된 웹 API</li>
+        <li>다양한 서비스의 데이터 활용</li>
+        <li>대부분 JSON 형식으로 응답</li>
+        <li>API 키가 필요한 경우가 많음</li>
+    </ul>
+
+    <h2>REST API</h2>
+    <ul>
+        <li>REpresentational State Transfer</li>
+        <li>HTTP 메서드 활용 (GET, POST, PUT, DELETE)</li>
+        <li>리소스 중심 설계</li>
+    </ul>
+
+    <h3>REST API 특징</h3>
+    <pre>
+GET    /users        모든 사용자 조회
+GET    /users/1      특정 사용자 조회
+POST   /users        새 사용자 생성
+PUT    /users/1      사용자 정보 수정
+DELETE /users/1      사용자 삭제
+    </pre>
+
+    <h2>API 요청 헤더</h2>
+    <pre>
+fetch("https://api.example.com/data", {
+    headers: {
+        "Authorization": "Bearer YOUR_API_KEY",
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+});
+    </pre>
+
+    <h2>무료 오픈 API 예시</h2>
+    <ul>
+        <li>JSONPlaceholder - 테스트용 가짜 REST API</li>
+        <li>OpenWeatherMap - 날씨 정보</li>
+        <li>GitHub API - GitHub 저장소 정보</li>
+        <li>공공데이터포털 - 한국 공공 데이터</li>
+        <li>Unsplash API - 무료 이미지</li>
+    </ul>
+
+    <h2>API 응답 처리</h2>
+    <pre>
+async function fetchData() {
+    try {
+        let response = await fetch("https://api.example.com/data");
+        
+        if (!response.ok) {
+            throw new Error("HTTP error! status: " + response.status);
+        }
+        
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("API 요청 실패:", error);
+    }
+}
+    </pre>
+
+    <h2>페이지네이션</h2>
+    <pre>
+async function fetchPage(page = 1, limit = 10) {
+    let url = `https://api.example.com/items?page=${page}&limit=${limit}`;
+    let response = await fetch(url);
+    return response.json();
+}
+    </pre>
+
+    <h2>검색 파라미터</h2>
+    <pre>
+let params = new URLSearchParams({
+    q: "검색어",
+    sort: "date",
+    order: "desc"
+});
+
+let url = "https://api.example.com/search?" + params.toString();
+    </pre>
+
+    <h2>에러 처리</h2>
+    <pre>
+async function apiRequest() {
+    try {
+        let response = await fetch(url);
+        let data = await response.json();
+        
+        if (data.error) {
+            console.error("API 에러:", data.error.message);
+            return null;
+        }
+        
+        return data;
+    } catch (error) {
+        if (error.name === "NetworkError") {
+            console.error("네트워크 오류");
+        } else if (error.name === "SyntaxError") {
+            console.error("JSON 파싱 오류");
+        } else {
+            console.error("알 수 없는 오류:", error);
+        }
+    }
+}
+    </pre>
+
+    <h2>API 호출 제한</h2>
+    <ul>
+        <li>Rate Limiting - 시간당 요청 횟수 제한</li>
+        <li>Throttling - 요청 속도 제한</li>
+        <li>쿼터 - 일/월별 사용량 제한</li>
+    </ul>
+
+    <hr>
+    
+    <h2>실습 - JSONPlaceholder API</h2>
+    
+    <div style="margin: 20px 0;">
+        <button onclick="fetchPosts()">게시글 가져오기</button>
+        <button onclick="fetchComments()">댓글 가져오기</button>
+        <button onclick="createPost()">새 게시글 생성</button>
+    </div>
+    
+    <div id="apiResult" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; max-height: 400px; overflow-y: auto;">
+        결과가 여기에 표시됩니다
+    </div>
+    
+    <h2>실습 - 실시간 검색</h2>
+    
+    <input type="text" id="searchInput" placeholder="사용자 이름 검색" onkeyup="searchUsers()">
+    <div id="searchResult" style="margin-top: 10px; padding: 10px; border: 1px solid #ccc;">
+        검색 결과가 여기에 표시됩니다
+    </div>
+    
+    <script>
+        async function fetchPosts() {
+            let resultDiv = document.getElementById("apiResult");
+            resultDiv.innerHTML = "로딩중...";
+            
+            try {
+                let response = await fetch("https://jsonplaceholder.typicode.com/posts?_limit=5");
+                let posts = await response.json();
+                
+                let html = "<h3>최근 게시글</h3>";
+                posts.forEach(post => {
+                    html += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #f5f5f5;">
+                            <h4>${post.title}</h4>
+                            <p>${post.body}</p>
+                            <small>게시글 ID: ${post.id}, 작성자 ID: ${post.userId}</small>
+                        </div>
+                    `;
+                });
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = "오류 발생: " + error.message;
+            }
+        }
+        
+        async function fetchComments() {
+            let resultDiv = document.getElementById("apiResult");
+            resultDiv.innerHTML = "로딩중...";
+            
+            try {
+                let response = await fetch("https://jsonplaceholder.typicode.com/posts/1/comments");
+                let comments = await response.json();
+                
+                let html = "<h3>게시글 1번의 댓글</h3>";
+                comments.slice(0, 3).forEach(comment => {
+                    html += `
+                        <div style="margin-bottom: 10px; padding: 8px; background: #f9f9f9;">
+                            <strong>${comment.name}</strong><br>
+                            <small>${comment.email}</small><br>
+                            <p>${comment.body}</p>
+                        </div>
+                    `;
+                });
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = "오류 발생: " + error.message;
+            }
+        }
+        
+        async function createPost() {
+            let resultDiv = document.getElementById("apiResult");
+            resultDiv.innerHTML = "전송중...";
+            
+            let newPost = {
+                title: "테스트 게시글",
+                body: "이것은 API 테스트를 위한 게시글입니다.",
+                userId: 1
+            };
+            
+            try {
+                let response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(newPost)
+                });
+                
+                let result = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <h3>새 게시글 생성 완료</h3>
+                    <p>생성된 게시글 ID: ${result.id}</p>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                    <p><em>참고: 이것은 테스트 API이므로 실제로 저장되지는 않습니다.</em></p>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = "오류 발생: " + error.message;
+            }
+        }
+        
+        let searchTimeout;
+        
+        async function searchUsers() {
+            clearTimeout(searchTimeout);
+            
+            searchTimeout = setTimeout(async () => {
+                let query = document.getElementById("searchInput").value.toLowerCase();
+                let resultDiv = document.getElementById("searchResult");
+                
+                if (query.length < 2) {
+                    resultDiv.innerHTML = "2글자 이상 입력하세요";
+                    return;
+                }
+                
+                resultDiv.innerHTML = "검색중...";
+                
+                try {
+                    let response = await fetch("https://jsonplaceholder.typicode.com/users");
+                    let users = await response.json();
+                    
+                    let filtered = users.filter(user => 
+                        user.name.toLowerCase().includes(query) ||
+                        user.username.toLowerCase().includes(query)
+                    );
+                    
+                    if (filtered.length === 0) {
+                        resultDiv.innerHTML = "검색 결과가 없습니다";
+                    } else {
+                        let html = "<strong>검색 결과:</strong><br>";
+                        filtered.forEach(user => {
+                            html += `${user.name} (@${user.username}) - ${user.email}<br>`;
+                        });
+                        resultDiv.innerHTML = html;
+                    }
+                } catch (error) {
+                    resultDiv.innerHTML = "검색 오류: " + error.message;
+                }
+            }, 300);
+        }
+    </script>
+</body>
+</html>
