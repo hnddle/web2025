@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>자바스크립트 소개</title>
+</head>
+<body>
+    <h1>자바스크립트 소개</h1>
+    
+    <h2>자바스크립트란?</h2>
+    <ul>
+        <li>웹 브라우저에서 동작하는 프로그래밍 언어</li>
+        <li>HTML과 CSS로 만든 정적인 웹페이지를 동적으로 만들어줌</li>
+        <li>1995년 브렌던 아이크가 개발</li>
+        <li>처음 이름은 LiveScript → JavaScript로 변경</li>
+    </ul>
+
+    <h2>자바스크립트 특징</h2>
+    <ul>
+        <li>인터프리터 언어 : 컴파일 과정 없이 바로 실행</li>
+        <li>동적 타입 언어 : 변수의 타입을 미리 선언할 필요 없음</li>
+        <li>객체 기반 언어</li>
+        <li>함수형 프로그래밍 지원</li>
+        <li>클라이언트 사이드 스크립트 언어</li>
+    </ul>
+
+    <h2>자바스크립트 사용 방법</h2>
+    
+    <h3>1. HTML 내부에 작성</h3>
+    <pre>
+&lt;script&gt;
+    alert('안녕하세요!');
+&lt;/script&gt;
+    </pre>
+
+    <h3>2. 외부 파일로 작성</h3>
+    <pre>
+&lt;script src="script.js"&gt;&lt;/script&gt;
+    </pre>
+
+    <h3>3. 인라인 방식 (권장하지 않음)</h3>
+    <pre>
+&lt;button onclick="alert('클릭!')"&gt;클릭하세요&lt;/button&gt;
+    </pre>
+
+    <h2>기본 문법</h2>
+    
+    <h3>변수 선언</h3>
+    <pre>
+var name = "홍길동";    // 구버전 방식
+let age = 25;          // 블록 스코프 변수
+const PI = 3.14;       // 상수
+    </pre>
+
+    <h3>데이터 타입</h3>
+    <ul>
+        <li>숫자형 (Number) : 10, 3.14</li>
+        <li>문자열 (String) : "안녕", '하세요'</li>
+        <li>불린 (Boolean) : true, false</li>
+        <li>undefined : 값이 할당되지 않은 변수</li>
+        <li>null : 의도적으로 비어있음을 표현</li>
+        <li>객체 (Object) : {name: "홍길동", age: 25}</li>
+        <li>배열 (Array) : [1, 2, 3, 4, 5]</li>
+    </ul>
+
+    <h2>출력 방법</h2>
+    <pre>
+console.log("콘솔에 출력");           // 개발자 도구 콘솔
+document.write("화면에 출력");         // HTML에 직접 출력
+alert("경고창 출력");                  // 경고창
+    </pre>
+
+    <h2>주석</h2>
+    <pre>
+// 한 줄 주석
+
+/*
+   여러 줄
+   주석
+*/
+    </pre>
+
+    <h2>간단한 예제</h2>
+    <pre>
+&lt;script&gt;
+    // 변수 선언
+    let name = "김철수";
+    let age = 20;
+    
+    // 출력
+    console.log("이름: " + name);
+    console.log("나이: " + age);
+    
+    // 조건문
+    if (age >= 20) {
+        console.log("성인입니다");
+    } else {
+        console.log("미성년자입니다");
+    }
+&lt;/script&gt;
+    </pre>
+
+    <hr>
+    
+    <h2>실습</h2>
+    <button onclick="alert('버튼을 클릭했습니다!')">클릭 테스트</button>
+    
+    <script>
+        console.log("자바스크립트가 실행되었습니다!");
+
+        let message = "자바스크립트 공부중";
+        console.log(message);
+    </script>
+</body>
+</html>
