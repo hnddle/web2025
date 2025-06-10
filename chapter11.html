@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HTTP 통신과 JSON</title>
+</head>
+<body>
+    <h1>HTTP 통신과 JSON</h1>
+    
+    <h2>AJAX (Asynchronous JavaScript and XML)</h2>
+    <ul>
+        <li>비동기적으로 서버와 통신</li>
+        <li>페이지 새로고침 없이 데이터 교환</li>
+        <li>더 나은 사용자 경험 제공</li>
+    </ul>
+
+    <h2>XMLHttpRequest</h2>
+    <pre>
+let xhr = new XMLHttpRequest();
+
+xhr.open("GET", "https://api.example.com/data", true);
+
+xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+        let data = JSON.parse(xhr.responseText);
+        console.log(data);
+    }
+};
+
+xhr.send();
+    </pre>
+
+    <h2>Fetch API</h2>
+    <ul>
+        <li>Promise 기반의 현대적인 API</li>
+        <li>더 간단하고 강력한 기능</li>
+    </ul>
+
+    <h3>GET 요청</h3>
+    <pre>
+fetch("https://api.example.com/data")
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error("Error:", error));
+    </pre>
+
+    <h3>POST 요청</h3>
+    <pre>
+fetch("https://api.example.com/users", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        name: "홍길동",
+        age: 25
+    })
+})
+.then(response => response.json())
+.then(data => console.log(data));
+    </pre>
+
+    <h2>JSON (JavaScript Object Notation)</h2>
+    <ul>
+        <li>데이터 교환 형식</li>
+        <li>텍스트 기반, 읽기 쉬움</li>
+        <li>자바스크립트 객체 문법과 유사</li>
+    </ul>
+
+    <h3>JSON 형식</h3>
+    <pre>
+{
+    "name": "홍길동",
+    "age": 25,
+    "city": "서울",
+    "hobbies": ["독서", "영화감상", "운동"],
+    "married": false,
+    "address": {
+        "street": "강남대로",
+        "zipcode": "12345"
+    }
+}
+    </pre>
+
+    <h3>JSON 메서드</h3>
+    <pre>
+let obj = {
+    name: "김철수",
+    age: 30,
+    hobbies: ["게임", "음악"]
+};
+
+let jsonString = JSON.stringify(obj);
+console.log(jsonString);
+
+let jsonString2 = '{"name":"이영희","age":28}';
+let obj2 = JSON.parse(jsonString2);
+console.log(obj2);
+
+JSON.stringify(obj, null, 2);
+    </pre>
+
+    <h2>async/await</h2>
+    <ul>
+        <li>비동기 코드를 동기적으로 작성</li>
+        <li>Promise를 더 쉽게 다룸</li>
+    </ul>
+    <pre>
+async function getData() {
+    try {
+        let response = await fetch("https://api.example.com/data");
+        let data = await response.json();
+        console.log(data);
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+getData();
+    </pre>
+
+    <h2>HTTP 상태 코드</h2>
+    <ul>
+        <li>200 : OK (성공)</li>
+        <li>201 : Created (생성됨)</li>
+        <li>400 : Bad Request (잘못된 요청)</li>
+        <li>401 : Unauthorized (인증 필요)</li>
+        <li>404 : Not Found (찾을 수 없음)</li>
+        <li>500 : Internal Server Error (서버 오류)</li>
+    </ul>
+
+    <h2>CORS (Cross-Origin Resource Sharing)</h2>
+    <ul>
+        <li>다른 도메인에서 리소스 요청시 발생</li>
+        <li>보안상의 이유로 브라우저가 차단</li>
+        <li>서버에서 허용 헤더 설정 필요</li>
+    </ul>
+
+    <hr>
+    
+    <h2>실습 - 사용자 정보 가져오기</h2>
+    
+    <div style="margin: 20px 0;">
+        <button onclick="fetchUsers()">사용자 목록 가져오기</button>
+        <button onclick="fetchRandomUser()">랜덤 사용자 가져오기</button>
+        <button onclick="createUser()">새 사용자 생성 (테스트)</button>
+    </div>
+    
+    <div id="result" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; min-height: 100px;">
+        결과가 여기에 표시됩니다
+    </div>
+    
+    <script>
+        async function fetchUsers() {
+            let resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "로딩중...";
+            
+            try {
+                let response = await fetch("https://jsonplaceholder.typicode.com/users");
+                let users = await response.json();
+                
+                let html = "<h3>사용자 목록</h3><ul>";
+                users.slice(0, 5).forEach(user => {
+                    html += `<li>${user.name} - ${user.email}</li>`;
+                });
+                html += "</ul>";
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = "오류가 발생했습니다: " + error.message;
+            }
+        }
+        
+        async function fetchRandomUser() {
+            let resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "로딩중...";
+            
+            try {
+                let randomId = Math.floor(Math.random() * 10) + 1;
+                let response = await fetch(`https://jsonplaceholder.typicode.com/users/${randomId}`);
+                let user = await response.json();
+                
+                let html = `
+                    <h3>사용자 정보</h3>
+                    <p><strong>이름:</strong> ${user.name}</p>
+                    <p><strong>사용자명:</strong> ${user.username}</p>
+                    <p><strong>이메일:</strong> ${user.email}</p>
+                    <p><strong>전화번호:</strong> ${user.phone}</p>
+                    <p><strong>웹사이트:</strong> ${user.website}</p>
+                    <p><strong>회사:</strong> ${user.company.name}</p>
+                `;
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = "오류가 발생했습니다: " + error.message;
+            }
+        }
+        
+        async function createUser() {
+            let resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "전송중...";
+            
+            let newUser = {
+                name: "테스트 사용자",
+                username: "testuser",
+                email: "test@example.com"
+            };
+            
+            try {
+                let response = await fetch("https://jsonplaceholder.typicode.com/users", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(newUser)
+                });
+                
+                let result = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <h3>생성된 사용자 (테스트)</h3>
+                    <p>서버가 반환한 데이터:</p>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                    <p><em>참고: 이것은 테스트 API이므로 실제로 저장되지는 않습니다.</em></p>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = "오류가 발생했습니다: " + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
