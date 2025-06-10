@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>이벤트, DOM</title>
+</head>
+<body>
+    <h1>이벤트, DOM</h1>
+    
+    <h2>DOM (Document Object Model)</h2>
+    <ul>
+        <li>HTML 문서를 객체로 표현한 것</li>
+        <li>자바스크립트로 HTML 요소를 조작할 수 있게 해줌</li>
+        <li>트리 구조로 구성됨</li>
+    </ul>
+
+    <h2>DOM 요소 선택</h2>
+    
+    <h3>getElementById</h3>
+    <pre>
+let element = document.getElementById("myId");
+    </pre>
+
+    <h3>getElementsByClassName</h3>
+    <pre>
+let elements = document.getElementsByClassName("myClass");
+    </pre>
+
+    <h3>getElementsByTagName</h3>
+    <pre>
+let divs = document.getElementsByTagName("div");
+    </pre>
+
+    <h3>querySelector</h3>
+    <pre>
+let element = document.querySelector("#myId");
+let element = document.querySelector(".myClass");
+let element = document.querySelector("div.myClass");
+    </pre>
+
+    <h3>querySelectorAll</h3>
+    <pre>
+let elements = document.querySelectorAll(".myClass");
+let elements = document.querySelectorAll("div > p");
+    </pre>
+
+    <h2>DOM 요소 조작</h2>
+    
+    <h3>내용 변경</h3>
+    <pre>
+element.textContent = "새로운 텍스트";
+element.innerHTML = "&lt;strong&gt;굵은 텍스트&lt;/strong&gt;";
+    </pre>
+
+    <h3>속성 변경</h3>
+    <pre>
+element.setAttribute("class", "newClass");
+element.getAttribute("id");
+element.removeAttribute("title");
+
+element.id = "newId";
+element.className = "newClass";
+    </pre>
+
+    <h3>스타일 변경</h3>
+    <pre>
+element.style.color = "red";
+element.style.backgroundColor = "yellow";
+element.style.fontSize = "20px";
+    </pre>
+
+    <h2>이벤트(Event)</h2>
+    <ul>
+        <li>사용자의 동작이나 브라우저의 상태 변화</li>
+        <li>클릭, 키보드 입력, 마우스 이동 등</li>
+    </ul>
+
+    <h2>이벤트 종류</h2>
+    <ul>
+        <li>click : 클릭했을 때</li>
+        <li>dblclick : 더블클릭했을 때</li>
+        <li>mouseover : 마우스가 올라갔을 때</li>
+        <li>mouseout : 마우스가 벗어났을 때</li>
+        <li>keydown : 키를 눌렀을 때</li>
+        <li>keyup : 키를 뗐을 때</li>
+        <li>change : 값이 변경됐을 때</li>
+        <li>submit : 폼이 제출됐을 때</li>
+        <li>load : 페이지가 로드됐을 때</li>
+    </ul>
+
+    <h2>이벤트 처리 방법</h2>
+    
+    <h3>1. HTML 속성으로 처리</h3>
+    <pre>
+&lt;button onclick="alert('클릭!')"&gt;클릭&lt;/button&gt;
+    </pre>
+
+    <h3>2. DOM 프로퍼티로 처리</h3>
+    <pre>
+let btn = document.getElementById("myBtn");
+btn.onclick = function() {
+    alert("클릭!");
+};
+    </pre>
+
+    <h3>3. addEventListener 사용</h3>
+    <pre>
+let btn = document.getElementById("myBtn");
+btn.addEventListener("click", function() {
+    alert("클릭!");
+});
+
+btn.addEventListener("click", handleClick);
+
+function handleClick() {
+    alert("클릭!");
+}
+    </pre>
+
+    <h2>이벤트 객체</h2>
+    <pre>
+element.addEventListener("click", function(event) {
+    console.log(event.type);
+    console.log(event.target);
+    console.log(event.clientX);
+    console.log(event.clientY);
+});
+    </pre>
+
+    <h2>이벤트 전파</h2>
+    <ul>
+        <li>버블링 : 자식 → 부모로 전파</li>
+        <li>캡처링 : 부모 → 자식으로 전파</li>
+    </ul>
+    <pre>
+event.stopPropagation();
+event.preventDefault();
+    </pre>
+
+    <hr>
+    
+    <h2>실습 예제</h2>
+    
+    <div id="demo" style="padding: 20px; background: #f0f0f0;">
+        <p id="text">여기를 클릭하세요</p>
+        <button id="changeBtn">텍스트 변경</button>
+        <button id="colorBtn">색상 변경</button>
+    </div>
+    
+    <br>
+    
+    <input type="text" id="inputText" placeholder="텍스트 입력">
+    <div id="output" style="margin-top: 10px; padding: 10px; border: 1px solid #ccc;">
+        입력한 내용이 여기에 표시됩니다
+    </div>
+    
+    <br>
+    
+    <div id="mouseArea" style="width: 200px; height: 100px; background: #ddd; text-align: center; line-height: 100px;">
+        마우스를 올려보세요
+    </div>
+    
+    <script>
+        document.getElementById("changeBtn").addEventListener("click", function() {
+            document.getElementById("text").textContent = "텍스트가 변경되었습니다!";
+        });
+        
+        document.getElementById("colorBtn").addEventListener("click", function() {
+            let colors = ["red", "blue", "green", "orange", "purple"];
+            let randomColor = colors[Math.floor(Math.random() * colors.length)];
+            document.getElementById("text").style.color = randomColor;
+        });
+        
+        document.getElementById("inputText").addEventListener("keyup", function(e) {
+            document.getElementById("output").textContent = e.target.value;
+        });
+        
+        let mouseArea = document.getElementById("mouseArea");
+        mouseArea.addEventListener("mouseover", function() {
+            this.style.backgroundColor = "#ffcccc";
+            this.textContent = "마우스가 올라왔습니다";
+        });
+        
+        mouseArea.addEventListener("mouseout", function() {
+            this.style.backgroundColor = "#ddd";
+            this.textContent = "마우스를 올려보세요";
+        });
+    </script>
+</body>
+</html>
