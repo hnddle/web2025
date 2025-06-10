@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>웹 API</title>
+</head>
+<body>
+    <h1>웹 API</h1>
+    
+    <h2>웹 API란?</h2>
+    <ul>
+        <li>브라우저가 제공하는 JavaScript API</li>
+        <li>웹 애플리케이션 기능 확장</li>
+        <li>다양한 기기 기능 접근</li>
+    </ul>
+
+    <h2>Local Storage</h2>
+    <ul>
+        <li>브라우저에 데이터 저장</li>
+        <li>영구 저장 (삭제하지 않는 한)</li>
+        <li>도메인별로 격리</li>
+    </ul>
+    <pre>
+localStorage.setItem("name", "홍길동");
+localStorage.setItem("age", "25");
+
+let name = localStorage.getItem("name");
+console.log(name);
+
+localStorage.removeItem("age");
+
+localStorage.clear();
+    </pre>
+
+    <h2>Session Storage</h2>
+    <ul>
+        <li>세션 동안만 데이터 저장</li>
+        <li>탭/창 닫으면 삭제</li>
+    </ul>
+    <pre>
+sessionStorage.setItem("tempData", "임시 데이터");
+let data = sessionStorage.getItem("tempData");
+    </pre>
+
+    <h2>Geolocation API</h2>
+    <ul>
+        <li>사용자 위치 정보 접근</li>
+        <li>사용자 동의 필요</li>
+    </ul>
+    <pre>
+navigator.geolocation.getCurrentPosition(
+    function(position) {
+        console.log("위도:", position.coords.latitude);
+        console.log("경도:", position.coords.longitude);
+    },
+    function(error) {
+        console.error("위치 정보 오류:", error);
+    }
+);
+    </pre>
+
+    <h2>Web Storage Events</h2>
+    <pre>
+window.addEventListener("storage", function(e) {
+    console.log("키:", e.key);
+    console.log("이전값:", e.oldValue);
+    console.log("새값:", e.newValue);
+});
+    </pre>
+
+    <h2>History API</h2>
+    <ul>
+        <li>브라우저 히스토리 조작</li>
+        <li>SPA에서 주로 사용</li>
+    </ul>
+    <pre>
+history.pushState({page: 1}, "제목", "/page1");
+history.replaceState({page: 2}, "제목", "/page2");
+
+window.addEventListener("popstate", function(e) {
+    console.log(e.state);
+});
+
+history.back();
+history.forward();
+history.go(-2);
+    </pre>
+
+    <h2>Notification API</h2>
+    <ul>
+        <li>데스크톱 알림 표시</li>
+        <li>사용자 권한 필요</li>
+    </ul>
+    <pre>
+Notification.requestPermission().then(function(permission) {
+    if (permission === "granted") {
+        new Notification("알림 제목", {
+            body: "알림 내용입니다.",
+            icon: "icon.png"
+        });
+    }
+});
+    </pre>
+
+    <h2>Clipboard API</h2>
+    <pre>
+navigator.clipboard.writeText("복사할 텍스트")
+    .then(() => console.log("복사 성공"))
+    .catch(err => console.error("복사 실패:", err));
+
+navigator.clipboard.readText()
+    .then(text => console.log("붙여넣기:", text));
+    </pre>
+
+    <h2>Web Worker</h2>
+    <ul>
+        <li>백그라운드 스레드에서 실행</li>
+        <li>메인 스레드 차단 방지</li>
+    </ul>
+    <pre>
+let worker = new Worker("worker.js");
+
+worker.postMessage({cmd: "start", data: [1, 2, 3]});
+
+worker.onmessage = function(e) {
+    console.log("결과:", e.data);
+};
+    </pre>
+
+    <h2>Intersection Observer</h2>
+    <ul>
+        <li>요소가 뷰포트에 보이는지 감지</li>
+        <li>무한 스크롤, 지연 로딩 구현</li>
+    </ul>
+    <pre>
+let observer = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            console.log("요소가 보입니다");
+        }
+    });
+});
+
+observer.observe(document.querySelector("#target"));
+    </pre>
+
+    <hr>
+    
+    <h2>실습 - Local Storage 메모장</h2>
+    
+    <div style="margin: 20px 0;">
+        <textarea id="memo" rows="5" cols="50" placeholder="메모를 입력하세요"></textarea><br>
+        <button onclick="saveMemo()">저장</button>
+        <button onclick="loadMemo()">불러오기</button>
+        <button onclick="deleteMemo()">삭제</button>
+    </div>
+    
+    <h2>실습 - 위치 정보</h2>
+    
+    <button onclick="getLocation()">현재 위치 가져오기</button>
+    <div id="locationInfo" style="margin-top: 10px;"></div>
+    
+    <h2>실습 - 클립보드</h2>
+    
+    <input type="text" id="clipboardText" placeholder="복사할 텍스트">
+    <button onclick="copyText()">복사</button>
+    <button onclick="pasteText()">붙여넣기</button>
+    <div id="pastedText" style="margin-top: 10px;"></div>
+    
+    <script>
+        function saveMemo() {
+            let memo = document.getElementById("memo").value;
+            if (memo) {
+                localStorage.setItem("userMemo", memo);
+                alert("메모가 저장되었습니다!");
+            } else {
+                alert("메모를 입력하세요!");
+            }
+        }
+        
+        function loadMemo() {
+            let savedMemo = localStorage.getItem("userMemo");
+            if (savedMemo) {
+                document.getElementById("memo").value = savedMemo;
+                alert("메모를 불러왔습니다!");
+            } else {
+                alert("저장된 메모가 없습니다!");
+            }
+        }
+        
+        function deleteMemo() {
+            localStorage.removeItem("userMemo");
+            document.getElementById("memo").value = "";
+            alert("메모가 삭제되었습니다!");
+        }
+        
+        function getLocation() {
+            let infoDiv = document.getElementById("locationInfo");
+            
+            if (navigator.geolocation) {
+                infoDiv.innerHTML = "위치 정보를 가져오는 중...";
+                
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        infoDiv.innerHTML = 
+                            "위도: " + position.coords.latitude.toFixed(6) + "<br>" +
+                            "경도: " + position.coords.longitude.toFixed(6) + "<br>" +
+                            "정확도: " + position.coords.accuracy + "m";
+                    },
+                    function(error) {
+                        infoDiv.innerHTML = "위치 정보를 가져올 수 없습니다: " + error.message;
+                    }
+                );
+            } else {
+                infoDiv.innerHTML = "이 브라우저는 위치 정보를 지원하지 않습니다.";
+            }
+        }
+        
+        async function copyText() {
+            let text = document.getElementById("clipboardText").value;
+            
+            try {
+                await navigator.clipboard.writeText(text);
+                alert("텍스트가 복사되었습니다!");
+            } catch (err) {
+                alert("복사 실패: " + err);
+            }
+        }
+        
+        async function pasteText() {
+            try {
+                let text = await navigator.clipboard.readText();
+                document.getElementById("pastedText").textContent = "붙여넣은 텍스트: " + text;
+            } catch (err) {
+                alert("붙여넣기 실패: " + err);
+            }
+        }
+        
+        window.addEventListener("load", function() {
+            let savedMemo = localStorage.getItem("userMemo");
+            if (savedMemo) {
+                document.getElementById("memo").value = savedMemo;
+            }
+        });
+    </script>
+</body>
+</html>
