@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DOM 활용</title>
+</head>
+<body>
+    <h1>DOM 활용</h1>
+    
+    <h2>DOM 요소 생성</h2>
+    
+    <h3>createElement</h3>
+    <pre>
+let newDiv = document.createElement("div");
+let newP = document.createElement("p");
+let newBtn = document.createElement("button");
+    </pre>
+
+    <h3>createTextNode</h3>
+    <pre>
+let textNode = document.createTextNode("새로운 텍스트");
+newP.appendChild(textNode);
+    </pre>
+
+    <h2>DOM 요소 추가</h2>
+    
+    <h3>appendChild</h3>
+    <pre>
+let container = document.getElementById("container");
+container.appendChild(newDiv);
+    </pre>
+
+    <h3>insertBefore</h3>
+    <pre>
+let referenceNode = document.getElementById("reference");
+container.insertBefore(newDiv, referenceNode);
+    </pre>
+
+    <h3>innerHTML 사용</h3>
+    <pre>
+container.innerHTML += "&lt;div&gt;새로운 내용&lt;/div&gt;";
+    </pre>
+
+    <h2>DOM 요소 삭제</h2>
+    
+    <h3>removeChild</h3>
+    <pre>
+let parent = element.parentNode;
+parent.removeChild(element);
+    </pre>
+
+    <h3>remove</h3>
+    <pre>
+element.remove();
+    </pre>
+
+    <h2>DOM 요소 복사</h2>
+    <pre>
+let original = document.getElementById("original");
+let clone = original.cloneNode(true);
+document.body.appendChild(clone);
+    </pre>
+
+    <h2>클래스 조작</h2>
+    
+    <h3>classList</h3>
+    <pre>
+element.classList.add("newClass");
+element.classList.remove("oldClass");
+element.classList.toggle("active");
+element.classList.contains("myClass");
+    </pre>
+
+    <h2>부모/자식 요소 접근</h2>
+    <pre>
+let parent = element.parentNode;
+let children = element.children;
+let firstChild = element.firstElementChild;
+let lastChild = element.lastElementChild;
+let nextSibling = element.nextElementSibling;
+let prevSibling = element.previousElementSibling;
+    </pre>
+
+    <h2>폼 요소 다루기</h2>
+    
+    <h3>입력값 가져오기</h3>
+    <pre>
+let inputValue = document.getElementById("myInput").value;
+let checkedValue = document.getElementById("myCheckbox").checked;
+let selectedValue = document.getElementById("mySelect").value;
+    </pre>
+
+    <h3>폼 유효성 검사</h3>
+    <pre>
+function validateForm() {
+    let name = document.getElementById("name").value;
+    if (name === "") {
+        alert("이름을 입력하세요");
+        return false;
+    }
+    return true;
+}
+    </pre>
+
+    <h2>동적 스타일 적용</h2>
+    <pre>
+element.style.cssText = "color: red; font-size: 20px;";
+
+let computedStyle = window.getComputedStyle(element);
+console.log(computedStyle.color);
+    </pre>
+
+    <hr>
+    
+    <h2>실습 - 할 일 목록</h2>
+    
+    <div style="margin: 20px 0;">
+        <input type="text" id="todoInput" placeholder="할 일 입력">
+        <button onclick="addTodo()">추가</button>
+    </div>
+    
+    <ul id="todoList" style="list-style-type: none; padding: 0;">
+    </ul>
+    
+    <hr>
+    
+    <h2>실습 - 동적 테이블</h2>
+    
+    <div style="margin: 20px 0;">
+        이름: <input type="text" id="nameInput">
+        나이: <input type="text" id="ageInput">
+        <button onclick="addRow()">행 추가</button>
+    </div>
+    
+    <table id="dataTable" border="1" style="width: 300px;">
+        <thead>
+            <tr>
+                <th>이름</th>
+                <th>나이</th>
+                <th>삭제</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+    </table>
+    
+    <script>
+        function addTodo() {
+            let input = document.getElementById("todoInput");
+            let todoText = input.value.trim();
+            
+            if (todoText === "") {
+                alert("할 일을 입력하세요");
+                return;
+            }
+            
+            let li = document.createElement("li");
+            li.style.margin = "5px 0";
+            
+            let span = document.createElement("span");
+            span.textContent = todoText;
+            span.style.marginRight = "10px";
+            
+            let deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "삭제";
+            deleteBtn.onclick = function() {
+                li.remove();
+            };
+            
+            let completeBtn = document.createElement("button");
+            completeBtn.textContent = "완료";
+            completeBtn.style.marginRight = "5px";
+            completeBtn.onclick = function() {
+                span.style.textDecoration = span.style.textDecoration === "line-through" ? "none" : "line-through";
+                this.textContent = span.style.textDecoration === "line-through" ? "취소" : "완료";
+            };
+            
+            li.appendChild(span);
+            li.appendChild(completeBtn);
+            li.appendChild(deleteBtn);
+            
+            document.getElementById("todoList").appendChild(li);
+            input.value = "";
+        }
+        
+        function addRow() {
+            let name = document.getElementById("nameInput").value;
+            let age = document.getElementById("ageInput").value;
+            
+            if (name === "" || age === "") {
+                alert("모든 항목을 입력하세요");
+                return;
+            }
+            
+            let tbody = document.getElementById("tableBody");
+            let tr = document.createElement("tr");
+            
+            let nameTd = document.createElement("td");
+            nameTd.textContent = name;
+            
+            let ageTd = document.createElement("td");
+            ageTd.textContent = age;
+            
+            let deleteTd = document.createElement("td");
+            let deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "삭제";
+            deleteBtn.onclick = function() {
+                tr.remove();
+            };
+            deleteTd.appendChild(deleteBtn);
+            
+            tr.appendChild(nameTd);
+            tr.appendChild(ageTd);
+            tr.appendChild(deleteTd);
+            
+            tbody.appendChild(tr);
+            
+            document.getElementById("nameInput").value = "";
+            document.getElementById("ageInput").value = "";
+        }
+    </script>
+</body>
+</html>
